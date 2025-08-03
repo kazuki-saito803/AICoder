@@ -1,26 +1,15 @@
-# agent/tools.py の修正
-
-from langchain.agents import tool
 import os
-import json # jsonモジュールは他のツールで使う可能性があるので残しておくか、不要なら削除
+import json
 import git
+from langchain.tools import Tool
 
-@tool
-# 修正前: def write_file(input: str) -> str:
-# 修正後: pathとcontentを直接引数として受け取る
-def write_file(path: str, content: str) -> str:
+# --- write_file tool 関数本体 ---
+def write_file_fn(path: str, content: str) -> str:
     """Create a file. Expects 'path' (string) and 'content' (string)."""
     try:
-        # 以前のjson.loadsの行は不要になる
-        # data = json.loads(input)
-        # path = data.get("path")
-        # content = data.get("content")
-
         if not path or not content:
-            # pathやcontentが空の場合のチェックは残しておく
             return "Error: 'path' and 'content' are required."
         
-        # 親ディレクトリが存在しない場合に作成するロジックを追加（堅牢性向上のため、推奨）
         parent_dir = os.path.dirname(path)
         if parent_dir and not os.path.exists(parent_dir):
             os.makedirs(parent_dir, exist_ok=True)
@@ -31,8 +20,8 @@ def write_file(path: str, content: str) -> str:
     except Exception as e:
         return f"Error: {e}"
 
-@tool
-def make_directory(input: str) -> str:
+# --- make_directory tool 関数本体 ---
+def make_directory_fn(input: str) -> str:
     """Create a directory. Expects JSON string with 'path'."""
     try:
         data = json.loads(input)
@@ -42,8 +31,8 @@ def make_directory(input: str) -> str:
     except Exception as e:
         return f"Error: {e}"
 
-@tool
-def git_init_and_push(input: str) -> str:
+# --- git_init_and_push tool 関数本体 ---
+def git_init_and_push_fn(input: str) -> str:
     """Init Git and push. Expects JSON string with 'repo_url', 'commit_msg', and 'token'."""
     try:
         data = json.loads(input)
@@ -52,12 +41,31 @@ def git_init_and_push(input: str) -> str:
         token = data.get("token")
         if not all([repo_url, commit_msg, token]):
             return "Error: Missing required fields."
+
         repo = git.Repo.init(".")
-        repo.git.add(A=True) # A=True は all=True に変更を推奨 (gitpythonの新しいバージョン)
+        repo.git.add(all=True)
         repo.index.commit(commit_msg)
         remote_url = repo_url.replace("https://", f"https://{token}@")
         origin = repo.create_remote("origin", url=remote_url)
-        origin.push(refspec="master:master") # 'master' を可変にするか、'main' に変更を推奨
+        origin.push(refspec="master:master")
         return "Pushed to GitHub"
     except Exception as e:
         return f"Error: {e}"
+# agent/tools.py の最後に追加
+write_file = Tool.from_function(
+    func=write_file_fn,
+    name="write_file",
+    description="Create a file. Expects two arguments: path (str) and content (str)."
+)
+
+make_directory = Tool.from_function(
+    func=make_directory_fn,
+    name="make_directory",
+    description="Create a directory. Expects a JSON string with 'path'."
+)
+
+git_init_and_push = Tool.from_function(
+    func=git_init_and_push_fn,
+    name="git_init_and_push",
+    description="Init Git and push. Expects JSON string with 'repo_url', 'commit_msg', and 'token'."
+)

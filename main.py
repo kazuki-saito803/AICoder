@@ -8,12 +8,12 @@ def cli():
 
 @cli.command()
 def start():
-    print("🧠 AICoderへようこそ！やりたいことを入力してください：\n")
+    print("AICoderへようこそ！やりたいことを入力してください：\n")
     instruction = input("> ")
 
     graph, system_message = get_agent_executor()
 
-    print("\n🤖 実行中...\n")
+    print("\n実行中...\n")
     for step in graph.stream({"messages": [system_message, HumanMessage(content=instruction)]}):
         if "agent" in step:
             agent_data = step["agent"]
@@ -27,7 +27,7 @@ def start():
         if "tools" in step:
             print(f"[Tool Result] {step['tools']}")
 
-    print("\n✅ 完了しました！")
+    print("\n完了しました！")
 
 if __name__ == "__main__":
     cli()
