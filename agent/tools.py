@@ -56,23 +56,3 @@ def git_init_and_push(input: str) -> str:
         return "Pushed to GitHub"
     except Exception as e:
         return f"Error: {e}"
-'''
-# agent/tools.py の最後に追加
-write_file = Tool.from_function(
-    func=write_file_fn,
-    name="write_file",
-    description="Create a file. Expects two arguments: path (str) and content (str)."
-)
-
-make_directory = Tool.from_function(
-    func=make_directory_fn,
-    name="make_directory",
-    description="Create a directory. Expects a JSON string with 'path'."
-)
-
-git_init_and_push = Tool.from_function(
-    func=git_init_and_push_fn,
-    name="git_init_and_push",
-    description="Init Git and push. Expects JSON string with 'repo_url', 'commit_msg', and 'token'."
-)
-'''
