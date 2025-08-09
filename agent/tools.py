@@ -2,9 +2,12 @@ import os
 import json
 import git
 from langchain.tools import Tool
+from langchain_core.tools import tool
+
 
 # --- write_file tool 関数本体 ---
-def write_file_fn(path: str, content: str) -> str:
+@tool
+def write_file(path: str, content: str) -> str:
     """Create a file. Expects 'path' (string) and 'content' (string)."""
     try:
         if not path or not content:
@@ -21,7 +24,8 @@ def write_file_fn(path: str, content: str) -> str:
         return f"Error: {e}"
 
 # --- make_directory tool 関数本体 ---
-def make_directory_fn(input: str) -> str:
+@tool
+def make_directory(input: str) -> str:
     """Create a directory. Expects JSON string with 'path'."""
     try:
         data = json.loads(input)
@@ -32,7 +36,8 @@ def make_directory_fn(input: str) -> str:
         return f"Error: {e}"
 
 # --- git_init_and_push tool 関数本体 ---
-def git_init_and_push_fn(input: str) -> str:
+@tool
+def git_init_and_push(input: str) -> str:
     """Init Git and push. Expects JSON string with 'repo_url', 'commit_msg', and 'token'."""
     try:
         data = json.loads(input)
@@ -51,6 +56,7 @@ def git_init_and_push_fn(input: str) -> str:
         return "Pushed to GitHub"
     except Exception as e:
         return f"Error: {e}"
+'''
 # agent/tools.py の最後に追加
 write_file = Tool.from_function(
     func=write_file_fn,
@@ -69,3 +75,4 @@ git_init_and_push = Tool.from_function(
     name="git_init_and_push",
     description="Init Git and push. Expects JSON string with 'repo_url', 'commit_msg', and 'token'."
 )
+'''
