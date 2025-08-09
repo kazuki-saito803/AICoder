@@ -41,7 +41,7 @@
 1. モデルのPull
     以下のコマンドを実行
     ```bash
-    ollama pull gpt-oss:20B
+    ollama pull gpt-oss:20b
     ```
 1. Python仮想環境の構築
     cloneしたAICoderディレクトリに移動し, 以下のコマンドを実行
